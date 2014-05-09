@@ -93,7 +93,7 @@
     	var layer = e.target;
 
     	popup.setLatLng(e.latlng);
-    	popup.setContent("BLERG FOR NOW!");
+    	popup.setContent('<div class = "marker-title">' + layer.feature.properties.Complete_A + '</div>' + layer.feature.properties.LandUse);
 
     	if (!popup._map) popup.openOn(map);
     	window.clearTimeout(closeTooltip)
