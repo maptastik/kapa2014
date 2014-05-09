@@ -2,13 +2,14 @@
 <html>
 <head>
   <meta charset=utf-8 />
-  <title>KAPA2014 - MapBox.js Example</title>
+  <title>KAPA2014 - MapBox.js Example var1</title>
 
+  <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />
   <script src='https://api.tiles.mapbox.com/mapbox.js/v1.6.2/mapbox.js'></script>
   <link href='https://api.tiles.mapbox.com/mapbox.js/v1.6.2/mapbox.css' rel='stylesheet' />
 
   <style>
-  	/*stle for body and map div*/
+  	/*style for body and map div*/
     body { margin:0; padding:0; }
     #map { position:absolute; top:0; bottom:0; width:100%; }
   </style>
@@ -16,24 +17,22 @@
 </head>
 <body>
 
-<!--div for map-->	
-<div id='map'> </div>
-
-<!--style for elements within map div-->
 <style>
-.map-legend .swatch {
-  width:20px;
-  height:20px;
-  float:left;
-  margin-right:10px;
-  }
-.leaflet-popup-close-button {
-  display: none;
-  }
-.leaflet-popup-content-wrapper {
-  pointer-events: none;
-  }
+	#info {
+	    background:rgba(255,255,255,0.75);
+	    border:1px solid #fff;
+	    position:absolute;
+	    width:260px;
+	    top:10px;
+	    right:10px;
+	    padding:10px;
+	    border-radius:3px;
+    }
 </style>
+
+<!--div for map-->	
+<div id='map'></div>
+<div id='info'></div>
 
 <!--apparently the geojson has to be held within a variable within a js script?-->
 <script src = "http://maptastik.us/kapa2014/mb_example/js/downtownParcels84_attr.js"></script>
@@ -41,115 +40,27 @@
 <script>
 	//sets basemap
     var map = L.mapbox.map('map', 'rcooper.i6l50og4', {
-    	//scrollWheelZoom: false
     }).setView([38.212, -84.556], 15);
 
-    var popup = new L.Popup({autoPan: false});
+    var myLayer = L.mapbox.featureLayer().addTo(map);
 
-    //calls geojson held within js script above
-    var parcelLayer = L.geoJson(parcelData, {
-    	style: getStyle,
-    	onEachFeature: onEachFeature
-    }).addTo(map);
+    myLayer.setGeoJSON(parcelData);
 
-    function getStyle(feature) {
-    	return{
-    		weight: 2,
-    		opacity: 0.1,
-    		color: "#aaa",
-    		fillOpacity: 0.7,
-    		fillColor: getColor(feature.properties.LandUse)
-    	};
-    }
+myLayer.on('click',function(e) {
+    // Force the popup closed.
+    e.layer.closePopup();
 
-    function getColor(d) {
-    	return d == "11-1 Single Family" ? "#ffffb2":
-    		d == "11-2 Multi-Family" ? "#fed976":
-    		d == "11-3 Apartments" ? "#993404":
-    		d == "12-1 Commercial retail" ? "#b30000":
-    		d == "12-2 Commercial wholesale" ? "#fe9929":
-    		d == "12-3 Services" ? "#e34a33":
-    		d == "12-5 Government" ? "#f768a1":
-    		d == "12-6 Institutional" ? "#045a8d":
-    		d == "12-7 Educational" ? "#a6bddb":
-    		d == "16-1 Mixed use" ? "#810f7c":
-    		d == "21-1 Agricultural" ? "#31a354":
-    		d == "99-1 Vacant" ? "#f7f7f7":
-    		d == "99-4 Parking" ? "#636363":
-    		'#ffffe5';
-    }
+    var feature = e.layer.feature;
+    var info = '<h2>' + feature.properties.Complete_A + '</h2>' +
+               '<p>' + feature.properties.LandUse + '</p>';
 
-    function onEachFeature(feature, layer) {
-    	layer.on({
-    		mousemove: mousemove,
-    		mouseout: mouseout,
-    		click: zoomToFeature
-    	});
-    }
+    document.getElementById('info').innerHTML = info;
+});
 
-    var closeTooltip;
 
-    function mousemove(e) {
-    	var layer = e.target;
-
-    	popup.setLatLng(e.latlng);
-    	popup.setContent('<div class = "marker-title">' + layer.feature.properties.Complete_A + '</div>' + layer.feature.properties.LandUse);
-
-    	if (!popup._map) popup.openOn(map);
-    	window.clearTimeout(closeTooltip)
-
-    	layer.setStyle({
-    		weight: 3,
-    		opacity: 0.3,
-    		fillOpacity: 0.9
-    	});
-
-    	if (!L.Browser.ie && !L.Browser.opera) {
-    		layer.bringToFront();
-    	}
-    }
-
-    function mouseout(e) {
-    	parcelLayer.resetStyle(e.target);
-    	closeTooltip = window.setTimeout(function() {
-    		map.closePopup();
-    	}, 100);
-    }
-
-    function zoomToFeature(e) {
-    	map.fitBounds(e.target.getBounds());
-    }
-
-    // map.legendControl.addLegend(getLegendHTML());
-
-    // function getLegendHTML() {
-    // 	var uses = [
-    // 	"11-1 Single Family", 
-    // 	"11-2 Multi-Family", 
-    // 	"11-3 Apartments",
-    // 	"12-1 Commercial retail",
-    // 	"12-2 Commercial wholesale",
-    // 	"12-3 Services",
-    // 	"12-5 Government",
-    // 	"12-6 Institutional",
-    // 	"12-7 Educational",
-    // 	"16-1 Mixed use",
-    // 	"21-1 Agricultural",
-    // 	"99-1 Vacant",
-    // 	"99-4 Parking"
-    // 	],
-    // 	labels = [],
-    // 	from, to;
-
-    // 	for (var i = 0; i < uses.length; i++) {
-    // 		from = uses[i];
-    // 		to = uses[i + 1];
-
-    // 		labels.push(
-    // 			'<li><span class = "swatch" style = "background":' + getColor(from + 1) + '"></span> ' +
-    // 			from + (to ?))
-    // 	}
-    // }
+   map.on('move',function(e){
+    document.getElementById('info').innerHTML = '<h2>Click a marker</h2>';
+});
 
 </script>
 </body>
