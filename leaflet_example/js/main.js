@@ -28,7 +28,7 @@ function start(){
       parcels_geo_json= gt_parcels;
       parcels_data = data.results;
       initialize_map();
-      // draw_parcels();
+      draw_parcels();
     })
   });
 }
@@ -116,28 +116,28 @@ function initialize_table(){
   table.html(table_template(parcels_data));
 }
 
-// // Draw all the states on the map
-// function draw_parcels(){
-//   parcels_layer = L.geoJson(parcels_geo_json,{
-//     style: parcels_styles,
-//     onEachFeature: parcels_features,
-//     updateWhenIdle: true
-//   });
-//   parcels_layer.addTo(map);
-// }
+// Draw all the states on the map
+function draw_parcels(){
+  parcels_layer = L.geoJson(parcels_geo_json,{
+    style: parcels_styles,
+    // onEachFeature: parcels_features,
+    updateWhenIdle: true
+  });
+  parcels_layer.addTo(map);
+}
 
 // // Styles each state, populates color based on data
-// function parcels_styles(feature){
-//   return{
-//     stroke: true,
-//     fillColor: parcels_color(feature),
-//     fillOpacity: 0.7,
-//     weight: 1.5,
-//     opacity: 1,
-//     color: 'black',
-//     zIndex: 15
-//   };
-// }
+function parcels_styles(feature){
+  return{
+    stroke: true,
+    fillColor: "#ffffe5", //parcels_color(feature),
+    fillOpacity: 0.7,
+    weight: 1.5,
+    opacity: 1,
+    color: 'black',
+    zIndex: 15
+  };
+}
 // // Gets the color based on percentage
 // function parcels_color(feature){
 //   var parcels = get_single_parcels_data(feature.properties.GIS_MapID);
